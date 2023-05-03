@@ -37,7 +37,12 @@ class HomeScreen extends StatelessWidget {
               // Hay que saber el metodo del provider que nos da la lista de peliculas
               movies: moviesProvider.onGetNowPlaying,
             ),
-            MovieSlider()
+            MovieSlider(
+              // Resibimos las peliculas populares
+              movies: moviesProvider.popularMovies,
+              //*********************************************************************************************Aqui nos qiedamos en la clase************************* */
+              //titulo: 'Populares',
+            )
           ],
         ),
       ),

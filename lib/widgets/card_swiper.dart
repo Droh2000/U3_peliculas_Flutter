@@ -43,7 +43,7 @@ class CardSwiper extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(
                       context,
                       'details',
-                      arguments: null, // Le podemos pasar argumentos
+                      arguments: movie, // Le podemos pasar argumentos
                     ),
                 // Hijo para ponerle imagenes
                 child: ClipRRect(

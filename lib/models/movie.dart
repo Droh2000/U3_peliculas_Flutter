@@ -48,6 +48,14 @@ class Movie {
     return 'https://via.placeholder.com/300x400';
   }
 
+  // Recibir el titulo de la pelicula
+  get titleMovie {
+    if (this.originalTitle != null) {
+      return this.originalTitle.toString();
+    }
+    return ' ';
+  }
+
   // Este es para convertir a mapa
   factory Movie.fromRawJson(String str) => Movie.fromJson(json.decode(str));
   // Este para ocnvertir a JSON (SE usa en POST para mandar datoa)

@@ -3,8 +3,11 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:provider/provider.dart';
+import 'package:u3_peliculas/providers/movie_provider.dart';
 import 'package:u3_peliculas/widgets/movie_slader.dart';
 import 'package:u3_peliculas/widgets/widgets.dart';
+import 'package:u3_peliculas/models/models.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key});
@@ -16,17 +19,25 @@ class DetailsScreen extends StatelessWidget {
     final String movie =
         ModalRoute.of(context)?.settings.arguments.toString() ?? 'Sin nombre';
 
+    //int movieId = ModalRoute.of(context)!.settings.arguments as int;
+    //Provider.of<MoviesProvider>(context, listen: false).getOneMovie(movieId);
+    //final dataProvider = Provider.of<MoviesProvider>(context);
+    //final Movie pelicula = dataProvider.onGetNowPlaying;
+
+    final pelicula = ModalRoute.of(context)?.settings.arguments as Movie;
+
     return Scaffold(
       body: CustomScrollView(
         // Vamos a ahcerlo personalizado
         slivers: [
           // Son widets con un comportamieito
-          const _CustmoAppbar(),
+          _CustmoAppbar(pelicula: pelicula),
           SliverList(
               delegate: SliverChildListDelegate([
-            const _PosterAndTitle(),
-            const _Overview(),
-            const CastingCards(),
+            _PosterAndTitle(pelicula: pelicula),
+            _Overview(pelicula: pelicula),
+            //CastingCards(pelicula: pelicula),
+            _crearCasting(pelicula),
           ])),
         ],
       ),
@@ -34,8 +45,25 @@ class DetailsScreen extends StatelessWidget {
   }
 }
 
+// Este es para mostrar los datos del casting con la ventana detail_Screen
+Widget _crearCasting(Movie pelicula) {
+  final movieProvider = MoviesProvider();
+
+  return FutureBuilder(
+    future: movieProvider.getActors(pelicula.id.toString()),
+    builder: (context, AsyncSnapshot<List> snapshot) {
+      if (snapshot.hasData) {
+        return CastingCards(pelicula: pelicula, actors: snapshot.data);
+      } else {
+        return Center(child: CircularProgressIndicator());
+      }
+    },
+  );
+}
+
 class _CustmoAppbar extends StatelessWidget {
-  const _CustmoAppbar({super.key});
+  final Movie pelicula;
+  const _CustmoAppbar({super.key, required this.pelicula});
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +82,14 @@ class _CustmoAppbar extends StatelessWidget {
           // El titulo en la parte de abajo al centor
           alignment: Alignment.bottomCenter,
           color: Colors.black12,
-          child: const Text(
-            'Movie. title',
+          child: Text(
+            pelicula.title,
             style: TextStyle(fontSize: 18),
           ),
         ), // Esto es lo que va dentro dle appvar
-        background: const FadeInImage(
+        background: FadeInImage(
           placeholder: NetworkImage('https://via.placeholder.com/300x400'),
-          image: NetworkImage('https://via.placeholder.com/300x400'),
+          image: NetworkImage(pelicula.fullPosterImg),
           fit: BoxFit.cover, // Rellene todo el espacio
         ),
       ),
@@ -70,7 +98,8 @@ class _CustmoAppbar extends StatelessWidget {
 }
 
 class _PosterAndTitle extends StatelessWidget {
-  const _PosterAndTitle({super.key});
+  final Movie pelicula;
+  const _PosterAndTitle({super.key, required this.pelicula});
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +119,10 @@ class _PosterAndTitle extends StatelessWidget {
           // El primer hijo va a ser una imagen con bordes redondesdos
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: const FadeInImage(
-              placeholder: NetworkImage('https://via.placeholder.com/300x400'),
-              image: NetworkImage('https://via.placeholder.com/300x400'),
+            child: FadeInImage(
+              placeholder:
+                  const NetworkImage('https://via.placeholder.com/300x400'),
+              image: NetworkImage(pelicula.fullPosterImg),
               fit: BoxFit.cover,
               height: 150.0, // Hacer mas pequena la imagen
             ),
@@ -108,14 +138,14 @@ class _PosterAndTitle extends StatelessWidget {
               // Para que todo este justiicado a la izquierda
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'movie.title',
+                Text(
+                  pelicula.title,
                   style: TextStyle(fontSize: 20),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
-                const Text(
-                  'movie.title.original',
+                Text(
+                  pelicula.originalTitle,
                   style: TextStyle(fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -132,7 +162,7 @@ class _PosterAndTitle extends StatelessWidget {
                       width: 5,
                     ),
                     Text(
-                      '*',
+                      pelicula.voteAverage.toString(),
                       style: TextStyle(fontSize: 15),
                     ),
                   ],
@@ -147,14 +177,15 @@ class _PosterAndTitle extends StatelessWidget {
 }
 
 class _Overview extends StatelessWidget {
-  const _Overview({super.key});
+  final Movie pelicula;
+  const _Overview({super.key, required this.pelicula});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: const Text(
-        'HOLA NO SE QUE PONER YA HABKE SENNJE SLEM krkmfrer ferferf ,dmfmffnf ffmfnfnf fmfmfmfnf fnfdndnf ffnfnf f f f fnfnf  fnfnfnf ffnfnfnf f f f fnf fnfnf fnf, ededewdwed, ewdwedwedwededewdwedwedweded,wedwedwerfrmkmvjnajvhakfjfirhgirnfbgweffe,mrjfjfjfjfjfjfjfjfjf,rllrlrlrlrlrlrllr\n\n\n fmfmfmfmfmmfmf mrmrmrmrmmr fffmfmfmfmm dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfferferferferfrferererf HOLA NO SE QUE PONER YA HABKE SENNJE SLEM krkmfrer ferferf ,dmfmffnf ffmfnfnf fmfmfmfnf fnfdndnf ffnfnf f f f fnfnf  fnfnfnf ffnfnfnf f f f fnf fnfnf fnf, ededewdwed, ewdwedwedwededewdwedwed',
+      child: Text(
+        pelicula.overview,
         textAlign: TextAlign.justify,
         style: TextStyle(fontSize: 15),
       ),
